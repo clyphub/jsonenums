@@ -75,7 +75,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"./utils"
+	"utils"
 
 	"github.com/campoy/jsonenums/parser"
 )
