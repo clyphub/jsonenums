@@ -74,8 +74,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"utils"
+	"unicode"
 
 	"github.com/campoy/jsonenums/parser"
 )
@@ -85,6 +84,21 @@ var (
 	outputPrefix = flag.String("prefix", "", "prefix to be added to the output file")
 	outputSuffix = flag.String("suffix", "_jsonenums", "suffix to be added to the output file")
 )
+
+func ToSnake(in string) string {
+	runes := []rune(in)
+	length := len(runes)
+
+	var out []rune
+	for i := 0; i < length; i++ {
+		if i > 0 && unicode.IsUpper(runes[i]) && ((i+1 < length && unicode.IsLower(runes[i+1])) || unicode.IsLower(runes[i-1])) {
+			out = append(out, '_')
+		}
+		out = append(out, unicode.ToLower(runes[i]))
+	}
+
+	return string(out)
+}
 
 type CammelSnakePair struct {
 	CammelRep string
@@ -136,7 +150,7 @@ func main() {
 		cammelSnakePairs := make([]CammelSnakePair, len(values))
 		for i, value := range values {
 			cammelSnakePairs[i].CammelRep = value
-			cammelSnakePairs[i].SnakeRep = utils.ToSnake(value)
+			cammelSnakePairs[i].SnakeRep = ToSnake(value)
 		}
 
 		analysis.TypesAndValues[typeName] = cammelSnakePairs
