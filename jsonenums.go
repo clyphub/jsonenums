@@ -75,6 +75,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"./utils"
+
 	"github.com/campoy/jsonenums/parser"
 )
 
@@ -134,7 +136,7 @@ func main() {
 		cammelSnakePairs := make([]CammelSnakePair, len(values))
 		for i, value := range values {
 			cammelSnakePairs[i].CammelRep = value
-			cammelSnakePairs[i].SnakeRep = ToSnake(value)
+			cammelSnakePairs[i].SnakeRep = utils.ToSnake(value)
 		}
 
 		analysis.TypesAndValues[typeName] = cammelSnakePairs
