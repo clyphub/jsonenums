@@ -6,8 +6,6 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -67,7 +65,7 @@ func (r *TestCasing) Scan(i interface{}) error {
 	case string:
 		r.UnmarshalJSON([]byte(i.(string)))
 	default:
-		return errors.Errorf("Can't scan %T into type %T", i, r)
+		return fmt.Errorf("Can't scan %T into type %T", i, r)
 	}
 	return nil
 }
