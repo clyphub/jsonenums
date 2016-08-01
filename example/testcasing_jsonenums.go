@@ -63,7 +63,7 @@ func (r *TestCasing) UnmarshalJSON(data []byte) error {
 func (r *TestCasing) Scan(i interface{}) error {
 	switch t := i.(type) {
 	case string:
-		r.UnmarshalJSON([]byte(t))
+		return r.UnmarshalJSON([]byte(t))
 	default:
 		return fmt.Errorf("Can't scan %T into type %T", i, r)
 	}
