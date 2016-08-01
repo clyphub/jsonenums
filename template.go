@@ -14,6 +14,7 @@ var generatedTmpl = template.Must(template.New("generated").Parse(`
 package {{.PackageName}}
 
 import (
+    "database/sql/driver"
     "encoding/json"
     "fmt"
 )
@@ -22,12 +23,12 @@ import (
 
 var (
     _{{$typename}}NameToValue = map[string]{{$typename}} {
-        {{range $values}}"{{.}}": {{.}},
+        {{range $values}}"{{.SnakeRep}}": {{.CammelRep}},
         {{end}}
     }
 
     _{{$typename}}ValueToName = map[{{$typename}}]string {
-        {{range $values}}{{.}}: "{{.}}",
+        {{range $values}}{{.CammelRep}}: "{{.SnakeRep}}",
         {{end}}
     }
 )
@@ -36,7 +37,7 @@ func init() {
     var v {{$typename}}
     if _, ok := interface{}(v).(fmt.Stringer); ok {
         _{{$typename}}NameToValue = map[string]{{$typename}} {
-            {{range $values}}interface{}({{.}}).(fmt.Stringer).String(): {{.}},
+            {{range $values}}interface{}({{.CammelRep}}).(fmt.Stringer).String(): {{.CammelRep}},
             {{end}}
         }
     }
@@ -66,6 +67,22 @@ func (r *{{$typename}}) UnmarshalJSON(data []byte) error {
     }
     *r = v
     return nil
+}
+
+//Scan an input string into this structure for use with GORP
+func (r *{{$typename}}) Scan(i interface{}) error {
+	switch t := i.(type) {
+	case string:
+		r.UnmarshalJSON([]byte(t))
+	default:
+		return fmt.Errorf("Can't scan %T into type %T", i, r)
+	}
+	return nil
+}
+
+func (r {{$typename}}) Value() (driver.Value, error) {
+	bytes, err := r.MarshalJSON()
+	return string(bytes), err 
 }
 
 {{end}}

@@ -74,15 +74,37 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"unicode"
 
 	"github.com/campoy/jsonenums/parser"
 )
 
 var (
-	typeNames    = flag.String("type", "", "comma-separated list of type names; must be set")
-	outputPrefix = flag.String("prefix", "", "prefix to be added to the output file")
-	outputSuffix = flag.String("suffix", "_jsonenums", "suffix to be added to the output file")
+	typeNames           = flag.String("type", "", "comma-separated list of type names; must be set")
+	outputPrefix        = flag.String("prefix", "", "prefix to be added to the output file")
+	outputSuffix        = flag.String("suffix", "_jsonenums", "suffix to be added to the output file")
+	exportSnakeCaseJSON = flag.Bool("snake_case_json", false, "Map camel case variable names to snake case json?")
 )
+
+func ToSnake(in string) string {
+	runes := []rune(in)
+	length := len(runes)
+
+	var out []rune
+	for i := 0; i < length; i++ {
+		if i > 0 && unicode.IsUpper(runes[i]) && ((i+1 < length && unicode.IsLower(runes[i+1])) || unicode.IsLower(runes[i-1])) {
+			out = append(out, '_')
+		}
+		out = append(out, unicode.ToLower(runes[i]))
+	}
+
+	return string(out)
+}
+
+type CammelSnakePair struct {
+	CammelRep string
+	SnakeRep  string
+}
 
 func main() {
 	flag.Parse()
@@ -112,11 +134,11 @@ func main() {
 	var analysis = struct {
 		Command        string
 		PackageName    string
-		TypesAndValues map[string][]string
+		TypesAndValues map[string][]CammelSnakePair
 	}{
 		Command:        strings.Join(os.Args[1:], " "),
 		PackageName:    pkg.Name,
-		TypesAndValues: make(map[string][]string),
+		TypesAndValues: make(map[string][]CammelSnakePair),
 	}
 
 	// Run generate for each type.
@@ -125,7 +147,18 @@ func main() {
 		if err != nil {
 			log.Fatalf("finding values for type %v: %v", typeName, err)
 		}
-		analysis.TypesAndValues[typeName] = values
+
+		cammelSnakePairs := make([]CammelSnakePair, len(values))
+		for i, value := range values {
+			cammelSnakePairs[i].CammelRep = value
+			if *exportSnakeCaseJSON {
+				cammelSnakePairs[i].SnakeRep = ToSnake(value)
+			} else {
+				cammelSnakePairs[i].SnakeRep = value
+			}
+		}
+
+		analysis.TypesAndValues[typeName] = cammelSnakePairs
 
 		var buf bytes.Buffer
 		if err := generatedTmpl.Execute(&buf, analysis); err != nil {
