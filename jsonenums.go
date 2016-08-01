@@ -80,9 +80,10 @@ import (
 )
 
 var (
-	typeNames    = flag.String("type", "", "comma-separated list of type names; must be set")
-	outputPrefix = flag.String("prefix", "", "prefix to be added to the output file")
-	outputSuffix = flag.String("suffix", "_jsonenums", "suffix to be added to the output file")
+	typeNames           = flag.String("type", "", "comma-separated list of type names; must be set")
+	outputPrefix        = flag.String("prefix", "", "prefix to be added to the output file")
+	outputSuffix        = flag.String("suffix", "_jsonenums", "suffix to be added to the output file")
+	exportSnakeCaseJSON = flag.Bool("snake_case_json", false, "Map camel case variable names to snake case json?")
 )
 
 func ToSnake(in string) string {
@@ -150,7 +151,11 @@ func main() {
 		cammelSnakePairs := make([]CammelSnakePair, len(values))
 		for i, value := range values {
 			cammelSnakePairs[i].CammelRep = value
-			cammelSnakePairs[i].SnakeRep = ToSnake(value)
+			if *exportSnakeCaseJSON {
+				cammelSnakePairs[i].SnakeRep = ToSnake(value)
+			} else {
+				cammelSnakePairs[i].SnakeRep = value
+			}
 		}
 
 		analysis.TypesAndValues[typeName] = cammelSnakePairs
