@@ -71,9 +71,9 @@ func (r *{{$typename}}) UnmarshalJSON(data []byte) error {
 
 //Scan an input string into this structure for use with GORP
 func (r *{{$typename}}) Scan(i interface{}) error {
-	switch i.(type) {
+	switch t := i.(type) {
 	case string:
-		r.UnmarshalJSON([]byte(i.(string)))
+		r.UnmarshalJSON([]byte(t))
 	default:
 		return fmt.Errorf("Can't scan %T into type %T", i, r)
 	}
