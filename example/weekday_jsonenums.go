@@ -3,6 +3,7 @@
 package main
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 )
@@ -44,6 +45,7 @@ func init() {
 	}
 }
 
+// MarshalJSON is generated so WeekDay satisfies json.Marshaler.
 func (r WeekDay) MarshalJSON() ([]byte, error) {
 	if s, ok := interface{}(r).(fmt.Stringer); ok {
 		return json.Marshal(s.String())
@@ -55,6 +57,7 @@ func (r WeekDay) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
+// UnmarshalJSON is generated so WeekDay satisfies json.Unmarshaler.
 func (r *WeekDay) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
@@ -66,4 +69,22 @@ func (r *WeekDay) UnmarshalJSON(data []byte) error {
 	}
 	*r = v
 	return nil
+}
+
+//Scan an input string into this structure for use with GORP
+func (r *WeekDay) Scan(i interface{}) error {
+	switch t := i.(type) {
+	case []byte:
+		return r.UnmarshalJSON(t)
+	case string:
+		return r.UnmarshalJSON([]byte(t))
+	default:
+		return fmt.Errorf("Can't scan %T into type %T", i, r)
+	}
+	return nil
+}
+
+func (r WeekDay) Value() (driver.Value, error) {
+	bytes, err := r.MarshalJSON()
+	return string(bytes), err
 }
