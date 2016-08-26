@@ -3,6 +3,7 @@
 package main
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 )
@@ -41,6 +42,7 @@ func init() {
 	}
 }
 
+// MarshalJSON is generated so ShirtSize satisfies json.Marshaler.
 func (r ShirtSize) MarshalJSON() ([]byte, error) {
 	if s, ok := interface{}(r).(fmt.Stringer); ok {
 		return json.Marshal(s.String())
@@ -52,6 +54,7 @@ func (r ShirtSize) MarshalJSON() ([]byte, error) {
 	return json.Marshal(s)
 }
 
+// UnmarshalJSON is generated so ShirtSize satisfies json.Unmarshaler.
 func (r *ShirtSize) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
@@ -63,4 +66,20 @@ func (r *ShirtSize) UnmarshalJSON(data []byte) error {
 	}
 	*r = v
 	return nil
+}
+
+//Scan an input string into this structure for use with GORP
+func (r *ShirtSize) Scan(i interface{}) error {
+	switch t := i.(type) {
+	case string:
+		return r.UnmarshalJSON([]byte(t))
+	default:
+		return fmt.Errorf("Can't scan %T into type %T", i, r)
+	}
+	return nil
+}
+
+func (r ShirtSize) Value() (driver.Value, error) {
+	bytes, err := r.MarshalJSON()
+	return string(bytes), err
 }
