@@ -31,3 +31,19 @@ func TestToSnake(t *testing.T) {
 		}
 	}
 }
+
+func TestDropPrefix(t *testing.T) {
+	_, err := dropPrefix("abcd", "bc")
+	if err == nil {
+		t.Errorf("Expected error when dropping string that is not a prefix")
+	}
+
+	result, err := dropPrefix("bababa", "ba")
+	if err != nil {
+		t.Errorf("Expected no error, received %v", err)
+	}
+
+	if result != "baba" {
+		t.Errorf("Expected `baba`, received %s", result)
+	}
+}

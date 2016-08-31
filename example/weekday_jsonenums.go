@@ -45,14 +45,31 @@ func init() {
 	}
 }
 
-// MarshalJSON is generated so WeekDay satisfies json.Marshaler.
-func (r WeekDay) MarshalJSON() ([]byte, error) {
+func (r WeekDay) getString() (string, error) {
 	if s, ok := interface{}(r).(fmt.Stringer); ok {
-		return json.Marshal(s.String())
+		return s.String(), nil
 	}
 	s, ok := _WeekDayValueToName[r]
 	if !ok {
-		return nil, fmt.Errorf("invalid WeekDay: %d", r)
+		return "", fmt.Errorf("invalid WeekDay: %d", r)
+	}
+	return s, nil
+}
+
+func (r *WeekDay) setValue(str string) error {
+	v, ok := _WeekDayNameToValue[str]
+	if !ok {
+		return fmt.Errorf("invalid WeekDay %q", str)
+	}
+	*r = v
+	return nil
+}
+
+// MarshalJSON is generated so WeekDay satisfies json.Marshaler.
+func (r WeekDay) MarshalJSON() ([]byte, error) {
+	s, err := r.getString()
+	if err != nil {
+		return nil, err
 	}
 	return json.Marshal(s)
 }
@@ -63,12 +80,7 @@ func (r *WeekDay) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &s); err != nil {
 		return fmt.Errorf("WeekDay should be a string, got %s", data)
 	}
-	v, ok := _WeekDayNameToValue[s]
-	if !ok {
-		return fmt.Errorf("invalid WeekDay %q", s)
-	}
-	*r = v
-	return nil
+	return r.setValue(s)
 }
 
 //Scan an input string into this structure for use with GORP
@@ -77,7 +89,7 @@ func (r *WeekDay) Scan(i interface{}) error {
 	case []byte:
 		return r.UnmarshalJSON(t)
 	case string:
-		return r.UnmarshalJSON([]byte(t))
+		return r.setValue(t)
 	default:
 		return fmt.Errorf("Can't scan %T into type %T", i, r)
 	}
@@ -85,6 +97,5 @@ func (r *WeekDay) Scan(i interface{}) error {
 }
 
 func (r WeekDay) Value() (driver.Value, error) {
-	bytes, err := r.MarshalJSON()
-	return string(bytes), err
+	return r.getString()
 }

@@ -160,6 +160,8 @@ func main() {
 		}
 
 		cammelSnakePairs := make([]CammelSnakePair, len(values))
+		serializedNamesUsed := map[string]bool{}
+
 		for i, value := range values {
 			cammelSnakePairs[i].CammelRep = value
 			if exportSnakeCaseJSON != nil && *exportSnakeCaseJSON {
@@ -182,6 +184,10 @@ func main() {
 			if allCaps != nil && *allCaps {
 				cammelSnakePairs[i].SnakeRep = strings.ToUpper(cammelSnakePairs[i].SnakeRep)
 			}
+			if _, ok := serializedNamesUsed[cammelSnakePairs[i].SnakeRep]; ok {
+				log.Fatalf("Multiple iota consts map to serialized value %s", cammelSnakePairs[i].SnakeRep)
+			}
+			serializedNamesUsed[cammelSnakePairs[i].SnakeRep] = true
 		}
 
 		analysis.TypesAndValues[typeName] = cammelSnakePairs
