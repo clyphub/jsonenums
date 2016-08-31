@@ -86,6 +86,8 @@ func (r *WeekDay) UnmarshalJSON(data []byte) error {
 //Scan an input string into this structure for use with GORP
 func (r *WeekDay) Scan(i interface{}) error {
 	switch t := i.(type) {
+	case []byte:
+		return r.setValue(string(t))
 	case string:
 		return r.setValue(t)
 	default:
