@@ -20,6 +20,29 @@ const (
 	normalCaseExample
 )
 
+type TestPrefixDrop int
+
+const (
+	prefixDropThisS TestPrefixDrop = iota
+	prefixDrophould
+	prefixDropWork
+)
+
+type TestAllCaps int
+
+const (
+	someCamel TestAllCaps = iota
+	some_snake
+	SoMMaDnEss
+)
+
+type TestFailWithCaps int
+
+const (
+	FaIL TestFailWithCaps = iota
+	FAiL
+)
+
 //go:generate jsonenums -type=ShirtSize
 
 type ShirtSize byte

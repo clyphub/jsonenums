@@ -67,7 +67,9 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"flag"
+	"fmt"
 	"go/format"
 	"io/ioutil"
 	"log"
@@ -80,10 +82,12 @@ import (
 )
 
 var (
-	typeNames           = flag.String("type", "", "comma-separated list of type names; must be set")
-	outputPrefix        = flag.String("prefix", "", "prefix to be added to the output file")
-	outputSuffix        = flag.String("suffix", "_jsonenums", "suffix to be added to the output file")
-	exportSnakeCaseJSON = flag.Bool("snake_case_json", false, "Map camel case variable names to snake case json?")
+	typeNames              = flag.String("type", "", "comma-separated list of type names; must be set")
+	outputPrefix           = flag.String("prefix", "", "prefix to be added to the output file")
+	outputSuffix           = flag.String("suffix", "_jsonenums", "suffix to be added to the output file")
+	exportSnakeCaseJSON    = flag.Bool("snake_case_json", false, "Map camel case variable names to snake case json?")
+	serializedPrefixToDrop = flag.String("prefix_to_drop", "", "string to drop from beginning of each iota const name when converting to string")
+	allCaps                = flag.Bool("all_caps", false, "convert the serialized string to uppercase?")
 )
 
 func ToSnake(in string) string {
@@ -104,6 +108,13 @@ func ToSnake(in string) string {
 type CammelSnakePair struct {
 	CammelRep string
 	SnakeRep  string
+}
+
+func dropPrefix(str, prefix string) (string, error) {
+	if strings.Index(str, prefix) != 0 {
+		return "", errors.New(fmt.Sprintf("%s is not a prefix of %s", prefix, str))
+	}
+	return str[len(prefix):], nil
 }
 
 func main() {
@@ -149,13 +160,34 @@ func main() {
 		}
 
 		cammelSnakePairs := make([]CammelSnakePair, len(values))
+		serializedNamesUsed := map[string]bool{}
+
 		for i, value := range values {
 			cammelSnakePairs[i].CammelRep = value
-			if *exportSnakeCaseJSON {
+			if exportSnakeCaseJSON != nil && *exportSnakeCaseJSON {
 				cammelSnakePairs[i].SnakeRep = ToSnake(value)
+				if serializedPrefixToDrop != nil {
+					*serializedPrefixToDrop = ToSnake(*serializedPrefixToDrop)
+				}
 			} else {
 				cammelSnakePairs[i].SnakeRep = value
 			}
+
+			if serializedPrefixToDrop != nil {
+				prefixRemoved, err := dropPrefix(cammelSnakePairs[i].SnakeRep, *serializedPrefixToDrop)
+				if err != nil {
+					log.Fatalf("Error removing prefix: %v", err)
+				}
+				cammelSnakePairs[i].SnakeRep = prefixRemoved
+			}
+
+			if allCaps != nil && *allCaps {
+				cammelSnakePairs[i].SnakeRep = strings.ToUpper(cammelSnakePairs[i].SnakeRep)
+			}
+			if _, ok := serializedNamesUsed[cammelSnakePairs[i].SnakeRep]; ok {
+				log.Fatalf("Multiple iota consts map to serialized value %s", cammelSnakePairs[i].SnakeRep)
+			}
+			serializedNamesUsed[cammelSnakePairs[i].SnakeRep] = true
 		}
 
 		analysis.TypesAndValues[typeName] = cammelSnakePairs
