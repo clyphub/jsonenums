@@ -74,8 +74,6 @@ func (r *TestAllCaps) UnmarshalJSON(data []byte) error {
 //Scan an input string into this structure for use with GORP
 func (r *TestAllCaps) Scan(i interface{}) error {
 	switch t := i.(type) {
-	case []byte:
-		return r.UnmarshalJSON(t)
 	case string:
 		return r.setValue(t)
 	default:

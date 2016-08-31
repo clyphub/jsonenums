@@ -42,14 +42,31 @@ func init() {
 	}
 }
 
-// MarshalJSON is generated so ShirtSize satisfies json.Marshaler.
-func (r ShirtSize) MarshalJSON() ([]byte, error) {
+func (r ShirtSize) getString() (string, error) {
 	if s, ok := interface{}(r).(fmt.Stringer); ok {
-		return json.Marshal(s.String())
+		return s.String(), nil
 	}
 	s, ok := _ShirtSizeValueToName[r]
 	if !ok {
-		return nil, fmt.Errorf("invalid ShirtSize: %d", r)
+		return "", fmt.Errorf("invalid ShirtSize: %d", r)
+	}
+	return s, nil
+}
+
+func (r *ShirtSize) setValue(str string) error {
+	v, ok := _ShirtSizeNameToValue[str]
+	if !ok {
+		return fmt.Errorf("invalid ShirtSize %q", str)
+	}
+	*r = v
+	return nil
+}
+
+// MarshalJSON is generated so ShirtSize satisfies json.Marshaler.
+func (r ShirtSize) MarshalJSON() ([]byte, error) {
+	s, err := r.getString()
+	if err != nil {
+		return nil, err
 	}
 	return json.Marshal(s)
 }
@@ -60,21 +77,14 @@ func (r *ShirtSize) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &s); err != nil {
 		return fmt.Errorf("ShirtSize should be a string, got %s", data)
 	}
-	v, ok := _ShirtSizeNameToValue[s]
-	if !ok {
-		return fmt.Errorf("invalid ShirtSize %q", s)
-	}
-	*r = v
-	return nil
+	return r.setValue(s)
 }
 
 //Scan an input string into this structure for use with GORP
 func (r *ShirtSize) Scan(i interface{}) error {
 	switch t := i.(type) {
-	case []byte:
-		return r.UnmarshalJSON(t)
 	case string:
-		return r.UnmarshalJSON([]byte(t))
+		return r.setValue(t)
 	default:
 		return fmt.Errorf("Can't scan %T into type %T", i, r)
 	}
@@ -82,6 +92,5 @@ func (r *ShirtSize) Scan(i interface{}) error {
 }
 
 func (r ShirtSize) Value() (driver.Value, error) {
-	bytes, err := r.MarshalJSON()
-	return string(bytes), err
+	return r.getString()
 }
