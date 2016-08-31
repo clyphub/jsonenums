@@ -84,6 +84,8 @@ func (r *{{$typename}}) UnmarshalJSON(data []byte) error {
 //Scan an input string into this structure for use with GORP
 func (r *{{$typename}}) Scan(i interface{}) error {
 	switch t := i.(type) {
+	case []byte:
+		return r.setValue(string(t))
 	case string:
 		return r.setValue(t)
 	default:
