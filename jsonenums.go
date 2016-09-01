@@ -162,23 +162,21 @@ func main() {
 		cammelSnakePairs := make([]CammelSnakePair, len(values))
 		serializedNamesUsed := map[string]bool{}
 
-		for i, value := range values {
-			cammelSnakePairs[i].CammelRep = value
-			if exportSnakeCaseJSON != nil && *exportSnakeCaseJSON {
-				cammelSnakePairs[i].SnakeRep = ToSnake(value)
-				if serializedPrefixToDrop != nil {
-					*serializedPrefixToDrop = ToSnake(*serializedPrefixToDrop)
-				}
-			} else {
-				cammelSnakePairs[i].SnakeRep = value
-			}
-
+		for i, rawValue := range values {
+			value := rawValue
 			if serializedPrefixToDrop != nil {
-				prefixRemoved, err := dropPrefix(cammelSnakePairs[i].SnakeRep, *serializedPrefixToDrop)
+				var err error
+				value, err = dropPrefix(rawValue, *serializedPrefixToDrop)
 				if err != nil {
 					log.Fatalf("Error removing prefix: %v", err)
 				}
-				cammelSnakePairs[i].SnakeRep = prefixRemoved
+			}
+
+			cammelSnakePairs[i].CammelRep = rawValue
+			if exportSnakeCaseJSON != nil && *exportSnakeCaseJSON {
+				cammelSnakePairs[i].SnakeRep = ToSnake(value)
+			} else {
+				cammelSnakePairs[i].SnakeRep = value
 			}
 
 			if allCaps != nil && *allCaps {
