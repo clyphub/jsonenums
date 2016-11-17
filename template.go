@@ -43,6 +43,12 @@ func init() {
     }
 }
 
+{{if $.Stringer}}
+func (r {{$typename}}) String() string {
+	return _{{$typename}}ValueToName[r]
+}
+{{end}}
+
 func (r {{$typename}}) getString() (string, error) {
     if s, ok := interface{}(r).(fmt.Stringer); ok {
         return s.String(), nil
@@ -99,4 +105,5 @@ func (r {{$typename}}) Value() (driver.Value, error) {
 }
 
 {{end}}
+
 `))

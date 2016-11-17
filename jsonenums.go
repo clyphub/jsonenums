@@ -88,6 +88,7 @@ var (
 	exportSnakeCaseJSON    = flag.Bool("snake_case_json", false, "Map camel case variable names to snake case json?")
 	serializedPrefixToDrop = flag.String("prefix_to_drop", "", "string to drop from beginning of each iota const name when converting to string")
 	allCaps                = flag.Bool("all_caps", false, "convert the serialized string to uppercase?")
+	generateStringer       = flag.Bool("stringer", false, "generating String() function for iota?")
 )
 
 func ToSnake(in string) string {
@@ -145,10 +146,12 @@ func main() {
 	var analysis = struct {
 		Command        string
 		PackageName    string
+		Stringer       bool
 		TypesAndValues map[string][]CammelSnakePair
 	}{
 		Command:        strings.Join(os.Args[1:], " "),
 		PackageName:    pkg.Name,
+		Stringer:       *generateStringer,
 		TypesAndValues: make(map[string][]CammelSnakePair),
 	}
 
