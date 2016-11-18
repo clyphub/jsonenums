@@ -44,8 +44,8 @@ func init() {
 }
 
 {{if $.Stringer}}
-func (r {{$typename}}) String() string {
-	return _{{$typename}}ValueToName[r]
+func (r {{$typename}}) ToString() (string, error) {
+	return r.getString()
 }
 {{end}}
 

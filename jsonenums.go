@@ -88,7 +88,7 @@ var (
 	exportSnakeCaseJSON    = flag.Bool("snake_case_json", false, "Map camel case variable names to snake case json?")
 	serializedPrefixToDrop = flag.String("prefix_to_drop", "", "string to drop from beginning of each iota const name when converting to string")
 	allCaps                = flag.Bool("all_caps", false, "convert the serialized string to uppercase?")
-	generateStringer       = flag.Bool("stringer", false, "generating String() function for iota?")
+	generateStringer       = flag.Bool("to_string", false, "generating ToString() function for iota?")
 )
 
 func ToSnake(in string) string {
