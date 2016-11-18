@@ -45,7 +45,11 @@ func init() {
 
 {{if $.Stringer}}
 func (r {{$typename}}) ToString() (string, error) {
-	return r.getString()
+    s, ok := _{{$typename}}ValueToName[r]
+    if !ok {
+        return "", fmt.Errorf("invalid {{$typename}}: %d", r)
+    }
+    return s, nil
 }
 {{end}}
 
@@ -53,11 +57,7 @@ func (r {{$typename}}) getString() (string, error) {
     if s, ok := interface{}(r).(fmt.Stringer); ok {
         return s.String(), nil
     }
-    s, ok := _{{$typename}}ValueToName[r]
-    if !ok {
-        return "", fmt.Errorf("invalid {{$typename}}: %d", r)
-    }
-    return s, nil
+    return r.ToString()
 }
 
 func (r *{{$typename}}) setValue(str string) error {
