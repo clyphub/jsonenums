@@ -45,17 +45,19 @@ func init() {
 	}
 }
 
-func (r WeekDay) getString() (string, error) {
-	if s, ok := interface{}(r).(fmt.Stringer); ok {
-		return s.String(), nil
-	}
-
+func (r WeekDay) toString() (string, error) {
 	s, ok := _WeekDayValueToName[r]
 	if !ok {
 		return "", fmt.Errorf("invalid WeekDay: %d", r)
 	}
 	return s, nil
+}
 
+func (r WeekDay) getString() (string, error) {
+	if s, ok := interface{}(r).(fmt.Stringer); ok {
+		return s.String(), nil
+	}
+	return r.toString()
 }
 
 func (r *WeekDay) setValue(str string) error {
