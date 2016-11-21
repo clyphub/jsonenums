@@ -45,7 +45,9 @@ func (r toString) getString() (string, error) {
 	if s, ok := interface{}(r).(fmt.Stringer); ok {
 		return s.String(), nil
 	}
+
 	return r.ToString()
+
 }
 
 func (r *toString) setValue(str string) error {
