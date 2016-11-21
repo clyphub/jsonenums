@@ -33,7 +33,7 @@ func init() {
 	}
 }
 
-func (r toString) ToString() (string, error) {
+func (r toString) toString() (string, error) {
 	s, ok := _toStringValueToName[r]
 	if !ok {
 		return "", fmt.Errorf("invalid toString: %d", r)
@@ -41,11 +41,15 @@ func (r toString) ToString() (string, error) {
 	return s, nil
 }
 
+func (r toString) ToString() (string, error) {
+	return r.toString()
+}
+
 func (r toString) getString() (string, error) {
 	if s, ok := interface{}(r).(fmt.Stringer); ok {
 		return s.String(), nil
 	}
-	return r.ToString()
+	return r.toString()
 }
 
 func (r *toString) setValue(str string) error {
