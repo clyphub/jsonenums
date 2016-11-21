@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+//go:generate jsonenums -type=TestCasing -snake_case_json=true
 type TestCasing int
 
 const (
@@ -20,6 +21,7 @@ const (
 	normalCaseExample
 )
 
+//go:generate jsonenums -type=TestPrefixDrop -prefix_to_drop=prefixDrop
 type TestPrefixDrop int
 
 const (
@@ -28,6 +30,7 @@ const (
 	prefixDropWork
 )
 
+//go:generate jsonenums -type=TestAllCaps -all_caps=true -snake_case_json=true
 type TestAllCaps int
 
 const (

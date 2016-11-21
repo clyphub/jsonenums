@@ -42,15 +42,19 @@ func init() {
 	}
 }
 
-func (r ShirtSize) getString() (string, error) {
-	if s, ok := interface{}(r).(fmt.Stringer); ok {
-		return s.String(), nil
-	}
+func (r ShirtSize) toString() (string, error) {
 	s, ok := _ShirtSizeValueToName[r]
 	if !ok {
 		return "", fmt.Errorf("invalid ShirtSize: %d", r)
 	}
 	return s, nil
+}
+
+func (r ShirtSize) getString() (string, error) {
+	if s, ok := interface{}(r).(fmt.Stringer); ok {
+		return s.String(), nil
+	}
+	return r.toString()
 }
 
 func (r *ShirtSize) setValue(str string) error {

@@ -101,7 +101,6 @@ func (r *{{$typename}}) Scan(i interface{}) error {
 	default:
 		return fmt.Errorf("Can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r {{$typename}}) Value() (driver.Value, error) {

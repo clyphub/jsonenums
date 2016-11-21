@@ -36,15 +36,19 @@ func init() {
 	}
 }
 
-func (r CustomStatus) getString() (string, error) {
-	if s, ok := interface{}(r).(fmt.Stringer); ok {
-		return s.String(), nil
-	}
+func (r CustomStatus) toString() (string, error) {
 	s, ok := _CustomStatusValueToName[r]
 	if !ok {
 		return "", fmt.Errorf("invalid CustomStatus: %d", r)
 	}
 	return s, nil
+}
+
+func (r CustomStatus) getString() (string, error) {
+	if s, ok := interface{}(r).(fmt.Stringer); ok {
+		return s.String(), nil
+	}
+	return r.toString()
 }
 
 func (r *CustomStatus) setValue(str string) error {
