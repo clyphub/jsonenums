@@ -43,6 +43,14 @@ func init() {
     }
 }
 
+func (r {{$typename}}) ListValues() (map[string]string){
+    {{$typename}}List := make(map[string]string)
+    for k := range _{{$typename}}NameToValue{
+        {{$typename}}List[k]=k
+    }
+    return {{$typename}}List
+}
+
 func (r {{$typename}}) toString() (string, error) {
     s, ok := _{{$typename}}ValueToName[r]
     if !ok {
