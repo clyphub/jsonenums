@@ -43,7 +43,7 @@ func init() {
     }
 }
 
-func (r {{$typename}}) ListValues() (map[string]string){
+func List{{$typename}}Values() (map[string]string){
     {{$typename}}List := make(map[string]string)
     for k := range _{{$typename}}NameToValue{
         {{$typename}}List[k]=k
