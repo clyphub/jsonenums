@@ -33,15 +33,19 @@ func init() {
 	}
 }
 
-func (r TestCasing) getString() (string, error) {
-	if s, ok := interface{}(r).(fmt.Stringer); ok {
-		return s.String(), nil
-	}
+func (r TestCasing) toString() (string, error) {
 	s, ok := _TestCasingValueToName[r]
 	if !ok {
 		return "", fmt.Errorf("invalid TestCasing: %d", r)
 	}
 	return s, nil
+}
+
+func (r TestCasing) getString() (string, error) {
+	if s, ok := interface{}(r).(fmt.Stringer); ok {
+		return s.String(), nil
+	}
+	return r.toString()
 }
 
 func (r *TestCasing) setValue(str string) error {
@@ -74,6 +78,8 @@ func (r *TestCasing) UnmarshalJSON(data []byte) error {
 //Scan an input string into this structure for use with GORP
 func (r *TestCasing) Scan(i interface{}) error {
 	switch t := i.(type) {
+	case []byte:
+		return r.setValue(string(t))
 	case string:
 		return r.setValue(t)
 	default:

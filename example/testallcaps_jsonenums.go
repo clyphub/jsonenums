@@ -33,15 +33,19 @@ func init() {
 	}
 }
 
-func (r TestAllCaps) getString() (string, error) {
-	if s, ok := interface{}(r).(fmt.Stringer); ok {
-		return s.String(), nil
-	}
+func (r TestAllCaps) toString() (string, error) {
 	s, ok := _TestAllCapsValueToName[r]
 	if !ok {
 		return "", fmt.Errorf("invalid TestAllCaps: %d", r)
 	}
 	return s, nil
+}
+
+func (r TestAllCaps) getString() (string, error) {
+	if s, ok := interface{}(r).(fmt.Stringer); ok {
+		return s.String(), nil
+	}
+	return r.toString()
 }
 
 func (r *TestAllCaps) setValue(str string) error {
@@ -74,6 +78,8 @@ func (r *TestAllCaps) UnmarshalJSON(data []byte) error {
 //Scan an input string into this structure for use with GORP
 func (r *TestAllCaps) Scan(i interface{}) error {
 	switch t := i.(type) {
+	case []byte:
+		return r.setValue(string(t))
 	case string:
 		return r.setValue(t)
 	default:
