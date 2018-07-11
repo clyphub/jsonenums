@@ -33,6 +33,14 @@ func init() {
 	}
 }
 
+func ListTestAllCapsValues() map[string]string {
+	TestAllCapsList := make(map[string]string)
+	for k := range _TestAllCapsNameToValue {
+		TestAllCapsList[k] = k
+	}
+	return TestAllCapsList
+}
+
 func (r TestAllCaps) toString() (string, error) {
 	s, ok := _TestAllCapsValueToName[r]
 	if !ok {
@@ -85,7 +93,6 @@ func (r *TestAllCaps) Scan(i interface{}) error {
 	default:
 		return fmt.Errorf("Can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r TestAllCaps) Value() (driver.Value, error) {

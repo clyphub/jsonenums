@@ -42,6 +42,14 @@ func init() {
 	}
 }
 
+func ListShirtSizeValues() map[string]string {
+	ShirtSizeList := make(map[string]string)
+	for k := range _ShirtSizeNameToValue {
+		ShirtSizeList[k] = k
+	}
+	return ShirtSizeList
+}
+
 func (r ShirtSize) toString() (string, error) {
 	s, ok := _ShirtSizeValueToName[r]
 	if !ok {
@@ -94,7 +102,6 @@ func (r *ShirtSize) Scan(i interface{}) error {
 	default:
 		return fmt.Errorf("Can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r ShirtSize) Value() (driver.Value, error) {

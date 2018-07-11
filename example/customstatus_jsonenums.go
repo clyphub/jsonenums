@@ -36,6 +36,14 @@ func init() {
 	}
 }
 
+func ListCustomStatusValues() map[string]string {
+	CustomStatusList := make(map[string]string)
+	for k := range _CustomStatusNameToValue {
+		CustomStatusList[k] = k
+	}
+	return CustomStatusList
+}
+
 func (r CustomStatus) toString() (string, error) {
 	s, ok := _CustomStatusValueToName[r]
 	if !ok {
@@ -88,7 +96,6 @@ func (r *CustomStatus) Scan(i interface{}) error {
 	default:
 		return fmt.Errorf("Can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r CustomStatus) Value() (driver.Value, error) {
