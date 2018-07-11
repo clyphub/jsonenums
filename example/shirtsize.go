@@ -30,6 +30,16 @@ const (
 	prefixDropWork
 )
 
+//go:generate jsonenums -type=TestUnderscoreToSpace -prefix_to_drop=TestUnderscoreToSpace_ -underscore_to_space=true
+type TestUnderscoreToSpace int
+
+const (
+	TestUnderscoreToSpace_Foo TestUnderscoreToSpace = iota
+	TestUnderscoreToSpace_FooBar
+	TestUnderscoreToSpace_Foo_Baz
+	TestUnderscoreToSpace_Foo_Baz_Qwerty
+)
+
 //go:generate jsonenums -type=TestAllCaps -all_caps=true -snake_case_json=true
 type TestAllCaps int
 

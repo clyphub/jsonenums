@@ -89,6 +89,7 @@ var (
 	serializedPrefixToDrop = flag.String("prefix_to_drop", "", "string to drop from beginning of each iota const name when converting to string")
 	allCaps                = flag.Bool("all_caps", false, "convert the serialized string to uppercase?")
 	generateStringer       = flag.Bool("to_string", false, "generating ToString() function for iota?")
+	underscoreToSpace      = flag.Bool("underscore_to_space", false, "replace underscores with spaces within each iota const name when converting to string")
 )
 
 func ToSnake(in string) string {
@@ -184,6 +185,9 @@ func main() {
 
 			if allCaps != nil && *allCaps {
 				cammelSnakePairs[i].SnakeRep = strings.ToUpper(cammelSnakePairs[i].SnakeRep)
+			}
+			if underscoreToSpace != nil && *underscoreToSpace {
+				cammelSnakePairs[i].SnakeRep = strings.Replace(cammelSnakePairs[i].SnakeRep, "_", " ", -1)
 			}
 			if _, ok := serializedNamesUsed[cammelSnakePairs[i].SnakeRep]; ok {
 				log.Fatalf("Multiple iota consts map to serialized value %s", cammelSnakePairs[i].SnakeRep)
