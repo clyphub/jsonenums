@@ -22,6 +22,18 @@ var (
 	}
 )
 
+type _TestAllCapsInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _TestAllCapsInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid TestAllCaps: %s", e.invalidValue)
+}
+
+func (e _TestAllCapsInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v TestAllCaps
 	if _, ok := interface{}(v).(fmt.Stringer); ok {

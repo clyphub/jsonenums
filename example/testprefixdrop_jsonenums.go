@@ -22,6 +22,18 @@ var (
 	}
 )
 
+type _TestPrefixDropInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _TestPrefixDropInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid TestPrefixDrop: %s", e.invalidValue)
+}
+
+func (e _TestPrefixDropInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v TestPrefixDrop
 	if _, ok := interface{}(v).(fmt.Stringer); ok {

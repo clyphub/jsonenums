@@ -33,6 +33,18 @@ var (
     }
 )
 
+type _{{$typename}}InvalidValueError struct {
+	invalidValue string
+}
+
+func (e _{{$typename}}InvalidValueError) Error() string {
+	return fmt.Sprintf("invalid {{$typename}}: %s", e.invalidValue)
+}
+
+func (e _{{$typename}}InvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
     var v {{$typename}}
     if _, ok := interface{}(v).(fmt.Stringer); ok {

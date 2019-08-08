@@ -22,6 +22,18 @@ var (
 	}
 )
 
+type _toStringInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _toStringInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid toString: %s", e.invalidValue)
+}
+
+func (e _toStringInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v toString
 	if _, ok := interface{}(v).(fmt.Stringer); ok {

@@ -28,6 +28,18 @@ var (
 	}
 )
 
+type _ShirtSizeInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _ShirtSizeInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid ShirtSize: %s", e.invalidValue)
+}
+
+func (e _ShirtSizeInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v ShirtSize
 	if _, ok := interface{}(v).(fmt.Stringer); ok {

@@ -30,6 +30,18 @@ var (
 	}
 )
 
+type _WeekDayInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _WeekDayInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid WeekDay: %s", e.invalidValue)
+}
+
+func (e _WeekDayInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v WeekDay
 	if _, ok := interface{}(v).(fmt.Stringer); ok {

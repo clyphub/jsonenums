@@ -24,6 +24,18 @@ var (
 	}
 )
 
+type _CustomStatusInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _CustomStatusInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid CustomStatus: %s", e.invalidValue)
+}
+
+func (e _CustomStatusInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v CustomStatus
 	if _, ok := interface{}(v).(fmt.Stringer); ok {

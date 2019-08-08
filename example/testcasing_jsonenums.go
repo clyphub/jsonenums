@@ -22,6 +22,18 @@ var (
 	}
 )
 
+type _TestCasingInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _TestCasingInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid TestCasing: %s", e.invalidValue)
+}
+
+func (e _TestCasingInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v TestCasing
 	if _, ok := interface{}(v).(fmt.Stringer); ok {
