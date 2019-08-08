@@ -45,6 +45,14 @@ func init() {
 	}
 }
 
+func ListWeekDayValues() map[string]string {
+	WeekDayList := make(map[string]string)
+	for k := range _WeekDayNameToValue {
+		WeekDayList[k] = k
+	}
+	return WeekDayList
+}
+
 func (r WeekDay) toString() (string, error) {
 	s, ok := _WeekDayValueToName[r]
 	if !ok {
@@ -95,9 +103,8 @@ func (r *WeekDay) Scan(i interface{}) error {
 	case string:
 		return r.setValue(t)
 	default:
-		return fmt.Errorf("Can't scan %T into type %T", i, r)
+		return fmt.Errorf("can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r WeekDay) Value() (driver.Value, error) {

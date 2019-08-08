@@ -33,6 +33,14 @@ func init() {
 	}
 }
 
+func ListtoStringValues() map[string]string {
+	toStringList := make(map[string]string)
+	for k := range _toStringNameToValue {
+		toStringList[k] = k
+	}
+	return toStringList
+}
+
 func (r toString) toString() (string, error) {
 	s, ok := _toStringValueToName[r]
 	if !ok {
@@ -87,9 +95,8 @@ func (r *toString) Scan(i interface{}) error {
 	case string:
 		return r.setValue(t)
 	default:
-		return fmt.Errorf("Can't scan %T into type %T", i, r)
+		return fmt.Errorf("can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r toString) Value() (driver.Value, error) {

@@ -33,6 +33,14 @@ func init() {
 	}
 }
 
+func ListTestCasingValues() map[string]string {
+	TestCasingList := make(map[string]string)
+	for k := range _TestCasingNameToValue {
+		TestCasingList[k] = k
+	}
+	return TestCasingList
+}
+
 func (r TestCasing) toString() (string, error) {
 	s, ok := _TestCasingValueToName[r]
 	if !ok {
@@ -83,9 +91,8 @@ func (r *TestCasing) Scan(i interface{}) error {
 	case string:
 		return r.setValue(t)
 	default:
-		return fmt.Errorf("Can't scan %T into type %T", i, r)
+		return fmt.Errorf("can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r TestCasing) Value() (driver.Value, error) {

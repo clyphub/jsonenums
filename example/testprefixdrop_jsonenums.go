@@ -33,6 +33,14 @@ func init() {
 	}
 }
 
+func ListTestPrefixDropValues() map[string]string {
+	TestPrefixDropList := make(map[string]string)
+	for k := range _TestPrefixDropNameToValue {
+		TestPrefixDropList[k] = k
+	}
+	return TestPrefixDropList
+}
+
 func (r TestPrefixDrop) toString() (string, error) {
 	s, ok := _TestPrefixDropValueToName[r]
 	if !ok {
@@ -83,9 +91,8 @@ func (r *TestPrefixDrop) Scan(i interface{}) error {
 	case string:
 		return r.setValue(t)
 	default:
-		return fmt.Errorf("Can't scan %T into type %T", i, r)
+		return fmt.Errorf("can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r TestPrefixDrop) Value() (driver.Value, error) {
