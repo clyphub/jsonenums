@@ -75,7 +75,7 @@ func (r toString) getString() (string, error) {
 func (r *toString) setValue(str string) error {
 	v, ok := _toStringNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid toString %q", str)
+		return _toStringInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -94,7 +94,7 @@ func (r toString) MarshalJSON() ([]byte, error) {
 func (r *toString) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("toString should be a string, got %s", data)
+		return _toStringInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }

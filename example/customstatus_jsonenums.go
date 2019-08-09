@@ -74,7 +74,7 @@ func (r CustomStatus) getString() (string, error) {
 func (r *CustomStatus) setValue(str string) error {
 	v, ok := _CustomStatusNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid CustomStatus %q", str)
+		return _CustomStatusInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -93,7 +93,7 @@ func (r CustomStatus) MarshalJSON() ([]byte, error) {
 func (r *CustomStatus) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("CustomStatus should be a string, got %s", data)
+		return _CustomStatusInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }

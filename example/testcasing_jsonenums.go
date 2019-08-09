@@ -71,7 +71,7 @@ func (r TestCasing) getString() (string, error) {
 func (r *TestCasing) setValue(str string) error {
 	v, ok := _TestCasingNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid TestCasing %q", str)
+		return _TestCasingInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -90,7 +90,7 @@ func (r TestCasing) MarshalJSON() ([]byte, error) {
 func (r *TestCasing) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("TestCasing should be a string, got %s", data)
+		return _TestCasingInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }

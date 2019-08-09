@@ -83,7 +83,7 @@ func (r WeekDay) getString() (string, error) {
 func (r *WeekDay) setValue(str string) error {
 	v, ok := _WeekDayNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid WeekDay %q", str)
+		return _WeekDayInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -102,7 +102,7 @@ func (r WeekDay) MarshalJSON() ([]byte, error) {
 func (r *WeekDay) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("WeekDay should be a string, got %s", data)
+		return _WeekDayInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }

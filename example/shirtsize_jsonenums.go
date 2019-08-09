@@ -80,7 +80,7 @@ func (r ShirtSize) getString() (string, error) {
 func (r *ShirtSize) setValue(str string) error {
 	v, ok := _ShirtSizeNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid ShirtSize %q", str)
+		return _ShirtSizeInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -99,7 +99,7 @@ func (r ShirtSize) MarshalJSON() ([]byte, error) {
 func (r *ShirtSize) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("ShirtSize should be a string, got %s", data)
+		return _ShirtSizeInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }

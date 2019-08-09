@@ -71,7 +71,7 @@ func (r TestPrefixDrop) getString() (string, error) {
 func (r *TestPrefixDrop) setValue(str string) error {
 	v, ok := _TestPrefixDropNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid TestPrefixDrop %q", str)
+		return _TestPrefixDropInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -90,7 +90,7 @@ func (r TestPrefixDrop) MarshalJSON() ([]byte, error) {
 func (r *TestPrefixDrop) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("TestPrefixDrop should be a string, got %s", data)
+		return _TestPrefixDropInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }
