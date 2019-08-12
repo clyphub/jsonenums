@@ -22,6 +22,18 @@ var (
 	}
 )
 
+type _toStringInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _toStringInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid toString: %s", e.invalidValue)
+}
+
+func (e _toStringInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v toString
 	if _, ok := interface{}(v).(fmt.Stringer); ok {
@@ -31,6 +43,14 @@ func init() {
 			interface{}(elemC).(fmt.Stringer).String(): elemC,
 		}
 	}
+}
+
+func ListtoStringValues() map[string]string {
+	toStringList := make(map[string]string)
+	for k := range _toStringNameToValue {
+		toStringList[k] = k
+	}
+	return toStringList
 }
 
 func (r toString) toString() (string, error) {
@@ -55,7 +75,7 @@ func (r toString) getString() (string, error) {
 func (r *toString) setValue(str string) error {
 	v, ok := _toStringNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid toString %q", str)
+		return _toStringInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -74,7 +94,7 @@ func (r toString) MarshalJSON() ([]byte, error) {
 func (r *toString) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("toString should be a string, got %s", data)
+		return _toStringInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }
@@ -87,9 +107,8 @@ func (r *toString) Scan(i interface{}) error {
 	case string:
 		return r.setValue(t)
 	default:
-		return fmt.Errorf("Can't scan %T into type %T", i, r)
+		return fmt.Errorf("can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r toString) Value() (driver.Value, error) {

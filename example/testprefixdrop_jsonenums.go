@@ -22,6 +22,18 @@ var (
 	}
 )
 
+type _TestPrefixDropInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _TestPrefixDropInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid TestPrefixDrop: %s", e.invalidValue)
+}
+
+func (e _TestPrefixDropInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v TestPrefixDrop
 	if _, ok := interface{}(v).(fmt.Stringer); ok {
@@ -31,6 +43,14 @@ func init() {
 			interface{}(prefixDropWork).(fmt.Stringer).String():  prefixDropWork,
 		}
 	}
+}
+
+func ListTestPrefixDropValues() map[string]string {
+	TestPrefixDropList := make(map[string]string)
+	for k := range _TestPrefixDropNameToValue {
+		TestPrefixDropList[k] = k
+	}
+	return TestPrefixDropList
 }
 
 func (r TestPrefixDrop) toString() (string, error) {
@@ -51,7 +71,7 @@ func (r TestPrefixDrop) getString() (string, error) {
 func (r *TestPrefixDrop) setValue(str string) error {
 	v, ok := _TestPrefixDropNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid TestPrefixDrop %q", str)
+		return _TestPrefixDropInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -70,7 +90,7 @@ func (r TestPrefixDrop) MarshalJSON() ([]byte, error) {
 func (r *TestPrefixDrop) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("TestPrefixDrop should be a string, got %s", data)
+		return _TestPrefixDropInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }
@@ -83,9 +103,8 @@ func (r *TestPrefixDrop) Scan(i interface{}) error {
 	case string:
 		return r.setValue(t)
 	default:
-		return fmt.Errorf("Can't scan %T into type %T", i, r)
+		return fmt.Errorf("can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r TestPrefixDrop) Value() (driver.Value, error) {

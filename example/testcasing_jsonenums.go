@@ -22,6 +22,18 @@ var (
 	}
 )
 
+type _TestCasingInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _TestCasingInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid TestCasing: %s", e.invalidValue)
+}
+
+func (e _TestCasingInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v TestCasing
 	if _, ok := interface{}(v).(fmt.Stringer); ok {
@@ -31,6 +43,14 @@ func init() {
 			interface{}(normalCaseExample).(fmt.Stringer).String(): normalCaseExample,
 		}
 	}
+}
+
+func ListTestCasingValues() map[string]string {
+	TestCasingList := make(map[string]string)
+	for k := range _TestCasingNameToValue {
+		TestCasingList[k] = k
+	}
+	return TestCasingList
 }
 
 func (r TestCasing) toString() (string, error) {
@@ -51,7 +71,7 @@ func (r TestCasing) getString() (string, error) {
 func (r *TestCasing) setValue(str string) error {
 	v, ok := _TestCasingNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid TestCasing %q", str)
+		return _TestCasingInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -70,7 +90,7 @@ func (r TestCasing) MarshalJSON() ([]byte, error) {
 func (r *TestCasing) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("TestCasing should be a string, got %s", data)
+		return _TestCasingInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }
@@ -83,9 +103,8 @@ func (r *TestCasing) Scan(i interface{}) error {
 	case string:
 		return r.setValue(t)
 	default:
-		return fmt.Errorf("Can't scan %T into type %T", i, r)
+		return fmt.Errorf("can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r TestCasing) Value() (driver.Value, error) {

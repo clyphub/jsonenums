@@ -24,6 +24,18 @@ var (
 	}
 )
 
+type _CustomStatusInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _CustomStatusInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid CustomStatus: %s", e.invalidValue)
+}
+
+func (e _CustomStatusInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v CustomStatus
 	if _, ok := interface{}(v).(fmt.Stringer); ok {
@@ -34,6 +46,14 @@ func init() {
 			interface{}(CustomStatusNoFun).(fmt.Stringer).String(): CustomStatusNoFun,
 		}
 	}
+}
+
+func ListCustomStatusValues() map[string]string {
+	CustomStatusList := make(map[string]string)
+	for k := range _CustomStatusNameToValue {
+		CustomStatusList[k] = k
+	}
+	return CustomStatusList
 }
 
 func (r CustomStatus) toString() (string, error) {
@@ -54,7 +74,7 @@ func (r CustomStatus) getString() (string, error) {
 func (r *CustomStatus) setValue(str string) error {
 	v, ok := _CustomStatusNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid CustomStatus %q", str)
+		return _CustomStatusInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -73,7 +93,7 @@ func (r CustomStatus) MarshalJSON() ([]byte, error) {
 func (r *CustomStatus) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("CustomStatus should be a string, got %s", data)
+		return _CustomStatusInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }
@@ -86,9 +106,8 @@ func (r *CustomStatus) Scan(i interface{}) error {
 	case string:
 		return r.setValue(t)
 	default:
-		return fmt.Errorf("Can't scan %T into type %T", i, r)
+		return fmt.Errorf("can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r CustomStatus) Value() (driver.Value, error) {

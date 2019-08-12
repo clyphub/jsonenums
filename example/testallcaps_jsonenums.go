@@ -22,6 +22,18 @@ var (
 	}
 )
 
+type _TestAllCapsInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _TestAllCapsInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid TestAllCaps: %s", e.invalidValue)
+}
+
+func (e _TestAllCapsInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v TestAllCaps
 	if _, ok := interface{}(v).(fmt.Stringer); ok {
@@ -31,6 +43,14 @@ func init() {
 			interface{}(SoMMaDnEss).(fmt.Stringer).String(): SoMMaDnEss,
 		}
 	}
+}
+
+func ListTestAllCapsValues() map[string]string {
+	TestAllCapsList := make(map[string]string)
+	for k := range _TestAllCapsNameToValue {
+		TestAllCapsList[k] = k
+	}
+	return TestAllCapsList
 }
 
 func (r TestAllCaps) toString() (string, error) {
@@ -51,7 +71,7 @@ func (r TestAllCaps) getString() (string, error) {
 func (r *TestAllCaps) setValue(str string) error {
 	v, ok := _TestAllCapsNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid TestAllCaps %q", str)
+		return _TestAllCapsInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -70,7 +90,7 @@ func (r TestAllCaps) MarshalJSON() ([]byte, error) {
 func (r *TestAllCaps) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("TestAllCaps should be a string, got %s", data)
+		return _TestAllCapsInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }
@@ -83,9 +103,8 @@ func (r *TestAllCaps) Scan(i interface{}) error {
 	case string:
 		return r.setValue(t)
 	default:
-		return fmt.Errorf("Can't scan %T into type %T", i, r)
+		return fmt.Errorf("can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r TestAllCaps) Value() (driver.Value, error) {

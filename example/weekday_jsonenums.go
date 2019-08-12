@@ -30,6 +30,18 @@ var (
 	}
 )
 
+type _WeekDayInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _WeekDayInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid WeekDay: %s", e.invalidValue)
+}
+
+func (e _WeekDayInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v WeekDay
 	if _, ok := interface{}(v).(fmt.Stringer); ok {
@@ -43,6 +55,14 @@ func init() {
 			interface{}(Sunday).(fmt.Stringer).String():    Sunday,
 		}
 	}
+}
+
+func ListWeekDayValues() map[string]string {
+	WeekDayList := make(map[string]string)
+	for k := range _WeekDayNameToValue {
+		WeekDayList[k] = k
+	}
+	return WeekDayList
 }
 
 func (r WeekDay) toString() (string, error) {
@@ -63,7 +83,7 @@ func (r WeekDay) getString() (string, error) {
 func (r *WeekDay) setValue(str string) error {
 	v, ok := _WeekDayNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid WeekDay %q", str)
+		return _WeekDayInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -82,7 +102,7 @@ func (r WeekDay) MarshalJSON() ([]byte, error) {
 func (r *WeekDay) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("WeekDay should be a string, got %s", data)
+		return _WeekDayInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }
@@ -95,9 +115,8 @@ func (r *WeekDay) Scan(i interface{}) error {
 	case string:
 		return r.setValue(t)
 	default:
-		return fmt.Errorf("Can't scan %T into type %T", i, r)
+		return fmt.Errorf("can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r WeekDay) Value() (driver.Value, error) {

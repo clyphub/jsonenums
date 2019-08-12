@@ -28,6 +28,18 @@ var (
 	}
 )
 
+type _ShirtSizeInvalidValueError struct {
+	invalidValue string
+}
+
+func (e _ShirtSizeInvalidValueError) Error() string {
+	return fmt.Sprintf("invalid ShirtSize: %s", e.invalidValue)
+}
+
+func (e _ShirtSizeInvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
 	var v ShirtSize
 	if _, ok := interface{}(v).(fmt.Stringer); ok {
@@ -40,6 +52,14 @@ func init() {
 			interface{}(XL).(fmt.Stringer).String(): XL,
 		}
 	}
+}
+
+func ListShirtSizeValues() map[string]string {
+	ShirtSizeList := make(map[string]string)
+	for k := range _ShirtSizeNameToValue {
+		ShirtSizeList[k] = k
+	}
+	return ShirtSizeList
 }
 
 func (r ShirtSize) toString() (string, error) {
@@ -60,7 +80,7 @@ func (r ShirtSize) getString() (string, error) {
 func (r *ShirtSize) setValue(str string) error {
 	v, ok := _ShirtSizeNameToValue[str]
 	if !ok {
-		return fmt.Errorf("invalid ShirtSize %q", str)
+		return _ShirtSizeInvalidValueError{invalidValue: str}
 	}
 	*r = v
 	return nil
@@ -79,7 +99,7 @@ func (r ShirtSize) MarshalJSON() ([]byte, error) {
 func (r *ShirtSize) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("ShirtSize should be a string, got %s", data)
+		return _ShirtSizeInvalidValueError{invalidValue: string(data)}
 	}
 	return r.setValue(s)
 }
@@ -92,9 +112,8 @@ func (r *ShirtSize) Scan(i interface{}) error {
 	case string:
 		return r.setValue(t)
 	default:
-		return fmt.Errorf("Can't scan %T into type %T", i, r)
+		return fmt.Errorf("can't scan %T into type %T", i, r)
 	}
-	return nil
 }
 
 func (r ShirtSize) Value() (driver.Value, error) {

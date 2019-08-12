@@ -33,6 +33,18 @@ var (
     }
 )
 
+type _{{$typename}}InvalidValueError struct {
+	invalidValue string
+}
+
+func (e _{{$typename}}InvalidValueError) Error() string {
+	return fmt.Sprintf("invalid {{$typename}}: %s", e.invalidValue)
+}
+
+func (e _{{$typename}}InvalidValueError) InvalidValueError() string {
+	return e.Error()
+}
+
 func init() {
     var v {{$typename}}
     if _, ok := interface{}(v).(fmt.Stringer); ok {
@@ -75,7 +87,7 @@ func (r {{$typename}}) getString() (string, error) {
 func (r *{{$typename}}) setValue(str string) error {
     v, ok := _{{$typename}}NameToValue[str]
     if !ok {
-        return fmt.Errorf("invalid {{$typename}} %q", str)
+        return _{{$typename}}InvalidValueError{invalidValue: str}
     }
     *r = v
     return nil
@@ -94,7 +106,7 @@ func (r {{$typename}}) MarshalJSON() ([]byte, error) {
 func (r *{{$typename}}) UnmarshalJSON(data []byte) error {
     var s string
     if err := json.Unmarshal(data, &s); err != nil {
-        return fmt.Errorf("{{$typename}} should be a string, got %s", data)
+        return _{{$typename}}InvalidValueError{invalidValue: string(data)}
     }
     return r.setValue(s)
 }
