@@ -125,20 +125,7 @@ func main() {
 	}
 	types := strings.Split(*typeNames, ",")
 
-	// Only one directory at a time can be processed, and the default is ".".
-	dir := "."
-	if args := flag.Args(); len(args) == 1 {
-		dir = args[0]
-	} else if len(args) > 1 {
-		log.Fatalf("only one directory at a time")
-	}
-	dir, err := filepath.Abs(dir)
-	if err != nil {
-		log.Fatalf("unable to determine absolute filepath for requested path %s: %v",
-			dir, err)
-	}
-
-	pkg, err := parser.ParsePackage(dir)
+	pkg, err := parser.ParsePackage(flag.Args())
 	if err != nil {
 		log.Fatalf("parsing package: %v", err)
 	}
@@ -207,9 +194,13 @@ func main() {
 			src = buf.Bytes()
 		}
 
+		goPath, exists := os.LookupEnv("GOPATH")
+		if !exists {
+			log.Fatalf("$GOPATH must be set")
+		}
 		output := strings.ToLower(*outputPrefix + typeName +
 			*outputSuffix + ".go")
-		outputPath := filepath.Join(dir, output)
+		outputPath := filepath.Join(goPath, "src", pkg.Path, output)
 		if err := ioutil.WriteFile(outputPath, src, 0644); err != nil {
 			log.Fatalf("writing output: %s", err)
 		}

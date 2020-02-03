@@ -9,45 +9,51 @@ package parser
 import (
 	"fmt"
 	"go/ast"
-	"go/build"
 	"go/constant"
 	"go/token"
 	"go/types"
 	"log"
-	"path/filepath"
 	"strings"
 
-	"golang.org/x/tools/go/loader"
+	"golang.org/x/tools/go/packages"
 )
 
 // A Package contains all the information related to a parsed package.
 type Package struct {
 	Name  string
+	Path  string
 	files []*ast.File
 
 	defs map[*ast.Ident]types.Object
 }
 
 // ParsePackage parses the package in the given directory and returns it.
-func ParsePackage(directory string) (*Package, error) {
-	relDir, err := filepath.Rel(filepath.Join(build.Default.GOPATH, "src"), directory)
-	if err != nil {
-		return nil, fmt.Errorf("provided directory not under GOPATH (%s): %v",
-			build.Default.GOPATH, err)
-	}
-
-	conf := loader.Config{TypeChecker: types.Config{FakeImportC: true}}
-	conf.Import(relDir)
-	program, err := conf.Load()
+func ParsePackage(args []string) (*Package, error) {
+	loadSyntax := packages.NeedName |
+		packages.NeedFiles |
+		packages.NeedCompiledGoFiles |
+		packages.NeedImports |
+		packages.NeedTypes |
+		packages.NeedTypesSizes |
+		packages.NeedSyntax |
+		packages.NeedTypesInfo
+	cfg := &packages.Config{Mode: loadSyntax}
+	pkgs, err := packages.Load(cfg, args...)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't load package: %v", err)
 	}
+	if len(pkgs) > 1 {
+		return nil, fmt.Errorf("only one directory at a time")
+	}
+	if len(pkgs) == 0 {
+		return nil, fmt.Errorf("no directories found")
+	}
 
-	pkgInfo := program.Package(relDir)
 	return &Package{
-		Name:  pkgInfo.Pkg.Name(),
-		files: pkgInfo.Files,
-		defs:  pkgInfo.Defs,
+		Name:  pkgs[0].Name,
+		Path:  pkgs[0].PkgPath,
+		files: pkgs[0].Syntax,
+		defs:  pkgs[0].TypesInfo.Defs,
 	}, nil
 }
 
