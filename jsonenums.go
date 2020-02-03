@@ -78,7 +78,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/campoy/jsonenums/parser"
+	"github.com/clyphub/jsonenums/parser"
 )
 
 var (
