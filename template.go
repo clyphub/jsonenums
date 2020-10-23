@@ -129,4 +129,9 @@ func (r {{$typename}}) Value() (driver.Value, error) {
 
 {{end}}
 
+// MarshalCSV is generated so {{$typename}} satisfies csv.Marshaler.
+func (r {{$typename}}) MarshalCSV() (string, error) {
+    return r.getString()
+}
+
 `))
