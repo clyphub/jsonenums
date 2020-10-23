@@ -133,7 +133,7 @@ func (r {{$typename}}) MarshalCSV() (string, error) {
 }
 
 // UnmarshalCSV is generated so {{$typename}} satisfies csv.Unmarshaler.
-func (r {{$typename}}) UnmarshalCSV(s string) (error) {
+func (r *{{$typename}}) UnmarshalCSV(s string) (error) {
     return r.setValue(s)
 }
 
