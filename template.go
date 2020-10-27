@@ -127,6 +127,7 @@ func (r {{$typename}}) Value() (driver.Value, error) {
 	return r.getString()
 }
 
+{{if not $.ExcludeCSV}}
 // MarshalCSV is generated so {{$typename}} satisfies csv.Marshaler.
 func (r {{$typename}}) MarshalCSV() (string, error) {
     return r.getString()
@@ -136,6 +137,7 @@ func (r {{$typename}}) MarshalCSV() (string, error) {
 func (r *{{$typename}}) UnmarshalCSV(s string) (error) {
     return r.setValue(s)
 }
+{{end}}
 
 {{end}}
 

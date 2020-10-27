@@ -89,6 +89,7 @@ var (
 	serializedPrefixToDrop = flag.String("prefix_to_drop", "", "string to drop from beginning of each iota const name when converting to string")
 	allCaps                = flag.Bool("all_caps", false, "convert the serialized string to uppercase?")
 	generateStringer       = flag.Bool("to_string", false, "generating ToString() function for iota?")
+	excludeCSVMethods      = flag.Bool("exclude_csv_methods", false, "skip generating MarshalCSV and UnmarshalCSV?")
 )
 
 func ToSnake(in string) string {
@@ -132,11 +133,13 @@ func main() {
 
 	var analysis = struct {
 		Command        string
+		ExcludeCSV     bool
 		PackageName    string
 		Stringer       bool
 		TypesAndValues map[string][]CammelSnakePair
 	}{
 		Command:        strings.Join(os.Args[1:], " "),
+		ExcludeCSV:     *excludeCSVMethods,
 		PackageName:    pkg.Name,
 		Stringer:       *generateStringer,
 		TypesAndValues: make(map[string][]CammelSnakePair),
